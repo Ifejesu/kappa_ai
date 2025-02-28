@@ -1,0 +1,17 @@
+
+project_id = "rspxqsnfnbshmchqksty"
+
+[api]
+endpoint = "https://rspxqsnfnbshmchqksty.supabase.co"
+auto_update_schemas = true
+port = 54321
+
+[db]
+port = 54322
+
+[functions]
+serve_port = 54323
+
+[[functions.http]]
+name = "generate-ai-response"
+verify_jwt = false
