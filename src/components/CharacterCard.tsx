@@ -30,6 +30,63 @@ interface CharacterCardProps {
   isCustom?: boolean;
 }
 
+export const DefaultCharacters: Character[] = [
+  {
+    id: "sophia12345ai",
+    name: "Sophia",
+    description:
+        "AI Assistant with a philosophical mind that encourages deep thinking and introspection.",
+    imageSrc: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80",
+    personality:
+        "Thoughtful, wise, patient",
+  },
+  {
+    id: "leo12345ai",
+    name: "Leo",
+    description:
+        "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80",
+    imageSrc: "/assets/leo.png",
+    personality:
+        "Creative, enthusiastic, inspiring",
+  },
+  {
+    id: "alex12345ai",
+    name: "Alex",
+    description:
+        "AI Assistant and motivational coach to help you achieve your goals and stay focused.",
+    imageSrc: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80",
+    personality: "Motivating, direct, supportive",
+  },
+  {
+    id: "jamie12345ai",
+    name: "Jamie",
+    description:
+        "AI Assistant and friendly companion for everyday conversations and light-hearted chats.",
+    imageSrc: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80",
+    personality:
+        "Friendly, warm, attentive",
+  },
+  {
+    id: "morgan12345ai",
+    name: "Morgan",
+    description:
+        "AI Assistant and practical advisor for problem-solving and strategic thinking.",
+    imageSrc: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80",
+    personality:
+        "Analytical, clear, practical",
+  },
+  {
+    id: "harper12345ai",
+    name: "Harper",
+    description:
+        "AI Assistant and history enthusiast with knowledge spanning various periods and cultures.",
+    imageSrc: "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?auto=format&fit=crop&q=80.",
+    personality:
+        "Knowledgeable, detailed, curious",
+  },
+];
+
+
 const CharacterCard: React.FC<CharacterCardProps> = ({ character, className = '', isCustom = false }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);

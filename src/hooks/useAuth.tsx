@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import {API} from "@/services/api.ts";
 
 export interface AuthState {
-    id: string,
+    id: number,
     username: string;
     password: string;
 }
@@ -28,7 +28,7 @@ function getStoredAuth(): AuthState {
             console.error('Error parsing sessionStorage auth data:', e);
         }
     }
-    return { id: '', username: '', password: ''};
+    return { id: NaN, username: '', password: ''};
 }
 
 export default function useAAuth() {
@@ -45,12 +45,12 @@ export default function useAAuth() {
         setAuth(newAuth);
     };
 
-    const signup = (username: string, password: string) => {
-        return api.signup({username, password})
+    const signup = async (username: string, password: string, image: string) => {
+        return api.signup({username, password, image})
     };
 
     const logout = () => {
-        setAuth({ username: '', password: '', id: '' });
+        setAuth({ username: '', password: '', id: NaN });
         localStorage.removeItem(STORAGE_KEY);
     };
 

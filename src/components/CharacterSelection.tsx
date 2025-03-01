@@ -18,7 +18,8 @@ const CharacterSelection = () => {
   const { toast } = useToast();
 
   // Combine default and user characters
-  const allCharacters = [...defaultCharacters, ...userCharacters];
+  // const allCharacters = [...defaultCharacters, ...userCharacters];
+  const allCharacters = [...defaultCharacters];
 
   const filteredCharacters = allCharacters.filter(character => 
     character.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -50,16 +51,16 @@ const CharacterSelection = () => {
         </p>
       </div>
       
-      <div className="flex justify-center mb-8">
-        <Button 
-          onClick={handleCreateClick}
-          className="group flex items-center gap-2"
-          variant="outline"
-        >
-          <PlusCircle size={18} className="group-hover:text-primary transition-colors" />
-          <span>Create Custom Character</span>
-        </Button>
-      </div>
+      {/*<div className="flex justify-center mb-8">*/}
+      {/*  <Button */}
+      {/*    onClick={handleCreateClick}*/}
+      {/*    className="group flex items-center gap-2"*/}
+      {/*    variant="outline"*/}
+      {/*  >*/}
+      {/*    <PlusCircle size={18} className="group-hover:text-primary transition-colors" />*/}
+      {/*    <span>Create Custom Character</span>*/}
+      {/*  </Button>*/}
+      {/*</div>*/}
       
       <div className="mb-8 max-w-md mx-auto">
         <div className="relative">

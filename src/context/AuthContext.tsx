@@ -5,7 +5,7 @@ interface AuthContextType {
   user: AuthState | null;
   loading: boolean;
   login: (username: string, password: string) => Promise<void>;
-  register: (username: string, password: string) => Promise<void>;
+  register: (username: string, password: string, image: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -13,7 +13,7 @@ export const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: false,
   login: async (u,p)=>{},
-  register: async (u,p)=>{},
+  register: async (u,p, i)=>{},
   signOut: async () => {}
 });
 
@@ -35,10 +35,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const register = async (username: string, password: string) => {
+  const register = async (username: string, password: string, image: string) => {
     setLoading(true);
     try {
-      await signup(username, password);
+      await signup(username, password, image);
     } catch (error) {
       console.error('Login error:', error);
       throw error;

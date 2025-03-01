@@ -5,6 +5,7 @@ const API_BASE_URL = import.meta.env.NEXT_PUBLIC_API_BASE_URL || 'http://localho
 export interface SignupPayload {
     username: string;
     password: string;
+    image: string;
 }
 
 export interface LoginPayload {
@@ -17,13 +18,6 @@ export interface ChatPayload {
 }
 
 export class API{
-    instance: AxiosInstance = axios.create({
-        baseURL: API_BASE_URL,
-        headers: {
-            "Accept": "application/json",
-        }
-    })
-
     async signup(payload: SignupPayload): Promise<void> {
         try {
             await axios.post(`${API_BASE_URL}/register`, payload, {
@@ -32,7 +26,7 @@ export class API{
                 },
             });
         } catch (error) {
-            throw new Error(error.response?.data || error.message);
+            throw new Error(error.response?.data?.detail || error.message);
         }
     }
 
@@ -41,7 +35,7 @@ export class API{
      * @param payload User login data.
      * @returns The backend response (e.g., user data and token).
      */
-    async login(payload: LoginPayload): Promise<{username: string, userId: string}> {
+    async login(payload: LoginPayload): Promise<{username: string, userId: number}> {
         try {
             const config = {
                 method: 'post',
@@ -53,8 +47,8 @@ export class API{
                 data : payload
             };
             const response = await axios.request(config);
-            const { sub, userId } = response.data.response;
-            return {username: sub, userId};
+            const { username, user_id } = response.data.response;
+            return {username, userId: user_id};
         } catch (error) {
             console.error('Login error:', error.response?.data?.detail || error.message);
             throw new Error(error.response?.data?.detail || error.message);

@@ -1,6 +1,6 @@
 
 import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { Character } from '../components/CharacterCard';
+import {Character, DefaultCharacters} from '../components/CharacterCard';
 import { supabase } from '../integrations/supabase/client';
 import { useAuth } from './AuthContext';
 import { useToast } from '@/components/ui/use-toast';
@@ -14,52 +14,6 @@ interface CharacterContextType {
   refreshCharacters: () => Promise<void>;
 }
 
-// Sample character data
-const sampleCharacters: Character[] = [
-  {
-    id: "philosopher",
-    name: "Sophia",
-    description: "A philosophical mind that encourages deep thinking and introspection.",
-    imageSrc: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80",
-    personality: "Thoughtful, wise, patient"
-  },
-  {
-    id: "creative",
-    name: "Leo",
-    description: "A creative spirit to inspire your artistic endeavors and imagination.",
-    imageSrc: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80",
-    personality: "Creative, enthusiastic, inspiring"
-  },
-  {
-    id: "coach",
-    name: "Alex",
-    description: "A motivational coach to help you achieve your goals and stay focused.",
-    imageSrc: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80",
-    personality: "Motivating, direct, supportive"
-  },
-  {
-    id: "friend",
-    name: "Jamie",
-    description: "A friendly companion for everyday conversations and light-hearted chats.",
-    imageSrc: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80",
-    personality: "Friendly, warm, attentive"
-  },
-  {
-    id: "advisor",
-    name: "Morgan",
-    description: "A practical advisor for problem-solving and strategic thinking.",
-    imageSrc: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80",
-    personality: "Analytical, clear, practical"
-  },
-  {
-    id: "historian",
-    name: "Harper",
-    description: "A history enthusiast with knowledge spanning various periods and cultures.",
-    imageSrc: "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?auto=format&fit=crop&q=80",
-    personality: "Knowledgeable, detailed, curious"
-  }
-];
-
 const CharacterContext = createContext<CharacterContextType | undefined>(undefined);
 
 export const CharacterProvider = ({ children }: { children: ReactNode }) => {
@@ -68,13 +22,13 @@ export const CharacterProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (user) {
-      fetchUserCharacters();
-    } else {
-      setUserCharacters([]);
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (user) {
+  //     fetchUserCharacters();
+  //   } else {
+  //     setUserCharacters([]);
+  //   }
+  // }, [user]);
 
   const fetchUserCharacters = async () => {
     if (!user) return;
@@ -216,7 +170,7 @@ export const CharacterProvider = ({ children }: { children: ReactNode }) => {
   return (
     <CharacterContext.Provider 
       value={{ 
-        defaultCharacters: sampleCharacters,
+        defaultCharacters: DefaultCharacters,
         userCharacters,
         isLoading,
         createCharacter,
