@@ -41,7 +41,7 @@ export class API {
             const config = {
                 method: 'post',
                 maxBodyLength: Infinity,
-                url: 'http://localhost:8000/login',
+                url: `${API_BASE_URL}/login`,
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
