@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import {useContext, useEffect, useState} from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import ConversationInterface from '../components/ConversationInterface';
@@ -7,8 +7,9 @@ import { Character } from '../components/CharacterCard';
 import Navbar from '../components/layout/Navbar';
 import { useCharacter } from '../context/CharacterContext';
 import { useConversation } from '../context/ConversationContext';
-import { useAuth } from '../context/AuthContext';
+import {AuthContext, useAuth} from '../context/AuthContext';
 import { supabase } from '../integrations/supabase/client';
+import {API} from "@/services/api.ts";
 
 const Conversation = () => {
   const { characterId } = useParams<{ characterId: string }>();
@@ -17,8 +18,10 @@ const Conversation = () => {
   const navigate = useNavigate();
   const { defaultCharacters, userCharacters } = useCharacter();
   const { setActiveCharacter } = useConversation();
-  const { user } = useAuth();
-  
+  const { user } = useContext(AuthContext);
+  const api = new API();
+
+
   useEffect(() => {
     const fetchCustomCharacter = async () => {
       if (!characterId || !user) {
@@ -33,7 +36,7 @@ const Conversation = () => {
             .from('characters')
             .select('*')
             .eq('id', characterId)
-            .eq('user_id', user.id)
+            .eq('user_id', user.username)
             .single();
           
           if (error || !data) {

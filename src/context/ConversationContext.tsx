@@ -3,7 +3,7 @@ import { createContext, useState, useContext, ReactNode, useEffect } from 'react
 import { Message } from '../components/MessageBubble';
 import { Character } from '../components/CharacterCard';
 import { supabase } from '../integrations/supabase/client';
-import { useAuth } from './AuthContext';
+import {AuthContext, useAuth} from './AuthContext';
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '@/components/ui/use-toast';
 import { Json } from '@/integrations/supabase/types';
@@ -35,7 +35,7 @@ export const ConversationProvider = ({ children }: { children: ReactNode }) => {
   const [conversations, setConversations] = useState<Record<string, Message[]>>({});
   const [activeCharacter, setActiveCharacter] = useState<Character | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { user } = useAuth();
+  const {user } = useContext(AuthContext);
   const { toast } = useToast();
 
   // Fetch conversations from Supabase when user logs in
@@ -53,7 +53,7 @@ export const ConversationProvider = ({ children }: { children: ReactNode }) => {
       const { data, error } = await supabase
         .from('conversations')
         .select('*')
-        .eq('user_id', user.id);
+        .eq('user_id', user.username);
       
       if (error) {
         throw error;
@@ -75,11 +75,11 @@ export const ConversationProvider = ({ children }: { children: ReactNode }) => {
       setConversations(conversationsMap);
     } catch (error) {
       console.error('Error fetching conversations:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load conversations',
-        variant: 'destructive',
-      });
+      // toast({
+      //   title: 'Error',
+      //   description: 'Failed to load conversations',
+      //   variant: 'destructive',
+      // });
     } finally {
       setIsLoading(false);
     }
@@ -96,7 +96,7 @@ export const ConversationProvider = ({ children }: { children: ReactNode }) => {
       const { data, error } = await supabase
         .from('conversations')
         .select('id')
-        .eq('user_id', user.id)
+        .eq('user_id', user.username)
         .eq('character_id', characterId)
         .maybeSingle();
       
@@ -118,7 +118,7 @@ export const ConversationProvider = ({ children }: { children: ReactNode }) => {
         await supabase
           .from('conversations')
           .insert({
-            user_id: user.id,
+            user_id: user.username,
             character_id: characterId,
             messages: serializedMessages
           });
@@ -213,7 +213,7 @@ export const ConversationProvider = ({ children }: { children: ReactNode }) => {
       const { error } = await supabase
         .from('conversations')
         .delete()
-        .eq('user_id', user.id)
+        .eq('user_id', user.username)
         .eq('character_id', characterId);
       
       if (error) {

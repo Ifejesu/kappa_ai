@@ -1,58 +1,65 @@
-
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { supabase } from "../integrations/supabase/client";
-import { Session, User } from '@supabase/supabase-js';
+import { createContext, useContext, useState, ReactNode } from 'react';
+import useAAuth, {AuthState} from "@/hooks/useAuth.tsx";
 
 interface AuthContextType {
-  session: Session | null;
-  user: User | null;
+  user: AuthState | null;
   loading: boolean;
+  login: (username: string, password: string) => Promise<void>;
+  register: (username: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType>({
+  user: null,
+  loading: false,
+  login: async (u,p)=>{},
+  register: async (u,p)=>{},
+  signOut: async () => {}
+});
+
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(false);
+  const {logout, login: handleLogin, auth: user, signup} = useAAuth()
 
-  useEffect(() => {
-    // Check active session
-    const getSession = async () => {
-      setLoading(true);
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      setUser(session?.user ?? null);
+
+  const login = async (username: string, password: string) => {
+    setLoading(true);
+    try {
+      await handleLogin(username, password);
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    } finally {
       setLoading(false);
-    };
+    }
+  };
 
-    getSession();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+  const register = async (username: string, password: string) => {
+    setLoading(true);
+    try {
+      await signup(username, password);
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    setLoading(true);
+    try {
+      logout();
+    } catch (error) {
+      console.error('Sign out error:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const value = {
-    session,
-    user,
-    loading,
-    signOut,
-  };
+  const value = { user, register, loading, login, signOut };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

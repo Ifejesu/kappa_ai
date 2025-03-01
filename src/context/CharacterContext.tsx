@@ -84,7 +84,7 @@ export const CharacterProvider = ({ children }: { children: ReactNode }) => {
       const { data, error } = await supabase
         .from('characters')
         .select('*')
-        .eq('user_id', user.id);
+        .eq('user_id', user.username);
       
       if (error) {
         throw error;
@@ -102,11 +102,11 @@ export const CharacterProvider = ({ children }: { children: ReactNode }) => {
       setUserCharacters(characters);
     } catch (error) {
       console.error('Error fetching user characters:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load your characters',
-        variant: 'destructive',
-      });
+      // toast({
+      //   title: 'Error',
+      //   description: 'Failed to load your characters',
+      //   variant: 'destructive',
+      // });
     } finally {
       setIsLoading(false);
     }
@@ -127,7 +127,7 @@ export const CharacterProvider = ({ children }: { children: ReactNode }) => {
       const { data, error } = await supabase
         .from('characters')
         .insert({
-          user_id: user.id,
+          user_id: user.username,
           name: characterData.name,
           description: characterData.description,
           personality: characterData.personality,
@@ -177,7 +177,7 @@ export const CharacterProvider = ({ children }: { children: ReactNode }) => {
         .from('characters')
         .delete()
         .eq('id', characterId)
-        .eq('user_id', user.id);
+        .eq('user_id', user.username);
       
       if (error) {
         throw error;
@@ -188,7 +188,7 @@ export const CharacterProvider = ({ children }: { children: ReactNode }) => {
         .from('conversations')
         .delete()
         .eq('character_id', characterId)
-        .eq('user_id', user.id);
+        .eq('user_id', user.username);
       
       setUserCharacters(prev => prev.filter(char => char.id !== characterId));
       

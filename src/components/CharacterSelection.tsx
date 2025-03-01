@@ -1,10 +1,10 @@
 
-import { useState } from 'react';
+import {useContext, useState} from 'react';
 import CharacterCard from './CharacterCard';
 import { useCharacter } from '../context/CharacterContext';
 import { PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '../context/AuthContext';
+import {AuthContext, useAuth} from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import CreateCharacterModal from './CreateCharacterModal';
 import { useToast } from '@/components/ui/use-toast';
@@ -13,7 +13,7 @@ const CharacterSelection = () => {
   const { defaultCharacters, userCharacters, isLoading } = useCharacter();
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const { user } = useAuth();
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -27,7 +27,7 @@ const CharacterSelection = () => {
   );
 
   const handleCreateClick = () => {
-    if (!user) {
+    if (!user.username) {
       toast({
         title: "Authentication required",
         description: "Please log in to create custom characters",

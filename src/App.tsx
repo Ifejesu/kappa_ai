@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ConversationProvider } from "./context/ConversationContext";
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import {AuthContext, AuthProvider, useAuth} from "./context/AuthContext";
 import { CharacterProvider } from "./context/CharacterContext";
 import Index from "./pages/Index";
 import Characters from "./pages/Characters";
@@ -13,12 +13,13 @@ import Conversation from "./pages/Conversation";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
+import {useContext} from "react";
 
 const queryClient = new QueryClient();
 
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useAuth();
+  const { user, loading } = useContext(AuthContext);
   
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;

@@ -1,8 +1,8 @@
 
-import { useState, useEffect } from 'react';
+import {useState, useEffect, useContext} from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, User, LogOut } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import {AuthContext, useAuth} from '../../context/AuthContext';
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,13 +14,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/components/ui/use-toast";
+import useAAuth from "@/hooks/useAuth.tsx";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user, signOut } = useContext(AuthContext);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -107,12 +108,12 @@ const Navbar = () => {
 
         {/* Auth Button or User Menu */}
         <div className="hidden md:block">
-          {user ? (
+          {user.username ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                   <Avatar>
-                    <AvatarFallback>{user.email?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
+                    <AvatarFallback>{user.username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
@@ -143,7 +144,7 @@ const Navbar = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback className="text-xs">{user.email?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
+                    <AvatarFallback className="text-xs">{user.username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>

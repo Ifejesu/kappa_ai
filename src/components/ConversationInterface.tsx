@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from 'react';
+import {useState, useEffect, useRef, useContext} from 'react';
 import { Send } from 'lucide-react';
 import MessageBubble, { Message } from './MessageBubble';
 import { Character } from './CharacterCard';
@@ -7,6 +7,8 @@ import { useConversation } from '../context/ConversationContext';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '../integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
+import {AuthContext} from "@/context/AuthContext.tsx";
+import {API} from "@/services/api.ts";
 
 interface ConversationInterfaceProps {
   character: Character;
@@ -19,6 +21,9 @@ const ConversationInterface: React.FC<ConversationInterfaceProps> = ({ character
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { getConversation, addMessage } = useConversation();
   const { toast } = useToast();
+  const { user } = useContext(AuthContext);
+  const api = new API();
+
   
   // Load conversation from context on mount
   useEffect(() => {
@@ -72,6 +77,11 @@ const ConversationInterface: React.FC<ConversationInterfaceProps> = ({ character
 
   const generateAIResponse = async (userInput: string) => {
     try {
+      const response = await api.sendChat(
+          user.username,
+          user.password,
+          userInput
+      )
       // Get recent conversation history (last 10 messages)
       const recentMessages = messages.slice(-10).map(msg => ({
         sender: msg.sender,
@@ -79,24 +89,24 @@ const ConversationInterface: React.FC<ConversationInterfaceProps> = ({ character
       }));
 
       // Call our edge function to get the AI response
-      const { data, error } = await supabase.functions.invoke('generate-ai-response', {
-        body: {
-          characterName: character.name,
-          characterDescription: character.description,
-          characterPersonality: character.personality,
-          userMessage: userInput,
-          conversationHistory: recentMessages
-        }
-      });
-
-      if (error) {
-        throw new Error(error.message);
-      }
+      // const { data, error } = await supabase.functions.invoke('generate-ai-response', {
+      //   body: {
+      //     characterName: character.name,
+      //     characterDescription: character.description,
+      //     characterPersonality: character.personality,
+      //     userMessage: userInput,
+      //     conversationHistory: recentMessages
+      //   }
+      // });
+      //
+      // if (error) {
+      //   throw new Error(error.message);
+      // }
 
       // Create AI message with the response
       const aiMessage: Message = {
         id: uuidv4(),
-        content: data.aiResponse,
+        content: response,
         sender: 'ai',
         timestamp: new Date(),
         characterId: character.id
