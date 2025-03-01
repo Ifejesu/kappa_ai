@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { Message } from "@/components/MessageBubble.tsx";
 
-const API_BASE_URL = import.meta.env.NEXT_PUBLIC_API_BASE_URL || 'https://kappa-ai-os7y.onrender.com';
+const API_BASE_URL = 'https://kappa-ai-os7y.onrender.com';
 
 export interface SignupPayload {
     username: string;
