@@ -57,21 +57,38 @@ export class API{
 
     /**
      * Send a chat message to the backend.
+     * @param characterId
      * @param username
      * @param password
      * @param message The chat message to send.
-     * @param token (Optional) Bearer token for authorization.
      * @returns The backend response, e.g., AI chat reply.
      */
-    async sendChat(username: string, password: string, message: string, token?: string): Promise<string> {
+    async sendChat(characterId: string, username: string, password: string, message: string): Promise<string> {
         try {
             const response = await axios.post(
                 `${API_BASE_URL}/chat`,
-                { message, username, token },
+                { ai_character_id: characterId, message, username, password },
                 {
                     headers: {
                         'Content-Type': 'application/json',
-                        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+                    },
+                }
+            );
+            return response.data.response || '';
+        } catch (error) {
+            console.error('Chat error:', error.response?.data || error.message);
+            throw new Error(error.response?.data || error.message);
+        }
+    }
+
+    async getChatHistory(username: string, password: string, characterId: string): Promise<string> {
+        try {
+            const response = await axios.post(
+                `${API_BASE_URL}/history`,
+                { ai_id: characterId, username, password },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
                     },
                 }
             );
