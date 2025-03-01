@@ -7,6 +7,8 @@ import {AuthContext, useAuth} from './AuthContext';
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '@/components/ui/use-toast';
 import { Json } from '@/integrations/supabase/types';
+import {API} from "@/services/api.ts";
+import {useLocation} from "react-router-dom";
 
 interface ConversationContextType {
   conversations: Record<string, Message[]>;
@@ -15,6 +17,7 @@ interface ConversationContextType {
   clearConversation: (characterId: string) => void;
   activeCharacter: Character | null;
   setActiveCharacter: (character: Character | null) => void;
+  fetchConversations: ()=> Promise<void>;
   isLoading: boolean;
 }
 
@@ -37,53 +40,69 @@ export const ConversationProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(false);
   const {user } = useContext(AuthContext);
   const { toast } = useToast();
-
-  // Fetch conversations from Supabase when user logs in
-  useEffect(() => {
-    if (user) {
-      fetchConversations();
-    }
-  }, [user]);
+  const api = new API();
 
   const fetchConversations = async () => {
     if (!user) return;
-    
+
     setIsLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('conversations')
-        .select('*')
-        .eq('user_id', user.username);
-      
-      if (error) {
-        throw error;
+    if(activeCharacter?.id){
+      try {
+        const messages = await api.getChatHistory(user.username, user.password, activeCharacter.id)
+        setConversations({[activeCharacter.id]: messages});
+      } catch (error) {
+        console.error('Error fetching conversations:', error);
+        // toast({
+        //   title: 'Error',
+        //   description: 'Failed to load conversations',
+        //   variant: 'destructive',
+        // });
+      } finally {
+        setIsLoading(false);
       }
-      
-      // Convert from Supabase format to local format
-      const conversationsMap: Record<string, Message[]> = {};
-      data.forEach(conversation => {
-        // Process messages to convert string timestamps back to Date objects
-        const messagesArray = Array.isArray(conversation.messages) ? conversation.messages : [];
-        const messages = messagesArray.map((message: any) => ({
-          ...message,
-          timestamp: new Date(message.timestamp)
-        }));
-        
-        conversationsMap[conversation.character_id] = messages;
-      });
-      
-      setConversations(conversationsMap);
-    } catch (error) {
-      console.error('Error fetching conversations:', error);
-      // toast({
-      //   title: 'Error',
-      //   description: 'Failed to load conversations',
-      //   variant: 'destructive',
-      // });
-    } finally {
-      setIsLoading(false);
     }
+
   };
+
+  // const fetchConversations = async () => {
+  //   if (!user) return;
+  //
+  //   setIsLoading(true);
+  //   try {
+  //     const { data, error } = await supabase
+  //       .from('conversations')
+  //       .select('*')
+  //       .eq('user_id', user.username);
+  //
+  //     if (error) {
+  //       throw error;
+  //     }
+  //
+  //     // Convert from Supabase format to local format
+  //     const conversationsMap: Record<string, Message[]> = {};
+  //     data.forEach(conversation => {
+  //       // Process messages to convert string timestamps back to Date objects
+  //       const messagesArray = Array.isArray(conversation.messages) ? conversation.messages : [];
+  //       const messages = messagesArray.map((message: any) => ({
+  //         ...message,
+  //         timestamp: new Date(message.timestamp)
+  //       }));
+  //
+  //       conversationsMap[conversation.character_id] = messages;
+  //     });
+  //
+  //     setConversations(conversationsMap);
+  //   } catch (error) {
+  //     console.error('Error fetching conversations:', error);
+  //     // toast({
+  //     //   title: 'Error',
+  //     //   description: 'Failed to load conversations',
+  //     //   variant: 'destructive',
+  //     // });
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const saveConversationToSupabase = async (characterId: string, messages: Message[]) => {
     if (!user) return;
@@ -147,7 +166,7 @@ export const ConversationProvider = ({ children }: { children: ReactNode }) => {
       
       // Store in Supabase if user is logged in
       if (user) {
-        saveConversationToSupabase(characterId, updatedConversation);
+        // saveConversationToSupabase(characterId, updatedConversation);
       }
       
       return {
@@ -248,6 +267,13 @@ export const ConversationProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Fetch conversations from Supabase when user logs in
+  useEffect(() => {
+    if (user?.id) {
+      fetchConversations();
+    }
+  }, [user?.id]);
+
   return (
     <ConversationContext.Provider 
       value={{ 
@@ -257,7 +283,8 @@ export const ConversationProvider = ({ children }: { children: ReactNode }) => {
         clearConversation,
         activeCharacter,
         setActiveCharacter,
-        isLoading
+        isLoading,
+        fetchConversations
       }}
     >
       {children}

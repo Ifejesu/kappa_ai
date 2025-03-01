@@ -1,4 +1,5 @@
 import axios, {AxiosInstance} from 'axios';
+import {Message} from "@/components/MessageBubble.tsx";
 
 const API_BASE_URL = import.meta.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
@@ -81,7 +82,29 @@ export class API{
         }
     }
 
-    async getChatHistory(username: string, password: string, characterId: string): Promise<string> {
+    convertMessages(messages: {id: string, message: string}[], characterId?: string): Message[] {
+        const result: Message[] = [];
+        let sender: 'user' | 'ai' = 'user';
+        const now = new Date();
+
+        messages.forEach(messageInput => {
+            result.push({
+                id: messageInput.id.toString(), // Convert number ID to string ID
+                content: messageInput.message,
+                sender: sender,
+                timestamp: now, // Use current timestamp
+                characterId: characterId,
+            });
+
+            // Toggle sender for the next message
+            sender = sender === 'user' ? 'ai' : 'user';
+            now.setMinutes(now.getMinutes()+1);
+        });
+
+        return result;
+    }
+
+    async getChatHistory(username: string, password: string, characterId: string): Promise<Message[]> {
         try {
             const response = await axios.post(
                 `${API_BASE_URL}/history`,
@@ -92,9 +115,10 @@ export class API{
                     },
                 }
             );
-            return response.data.response || '';
+            const messages: {id: string, message: string}[] = response.data;
+            return this.convertMessages(messages, characterId)
         } catch (error) {
-            console.error('Chat error:', error.response?.data || error.message);
+            console.error('getChatHistory error:', error.response?.data || error.message);
             throw new Error(error.response?.data || error.message);
         }
     }

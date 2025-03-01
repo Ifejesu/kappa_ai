@@ -44,7 +44,7 @@ const Auth = () => {
         title: "Success!",
         description: "Logged in successfully.",
       });
-      navigate('/');
+      navigate('/characters');
     } catch (error) {
       toast({
         title: "Error",

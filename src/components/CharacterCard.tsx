@@ -44,8 +44,8 @@ export const DefaultCharacters: Character[] = [
     id: "leo12345ai",
     name: "Leo",
     description:
-        "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80",
-    imageSrc: "/assets/leo.png",
+        "A creative spirit to inspire your artistic endeavors and imagination.",
+    imageSrc: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80",
     personality:
         "Creative, enthusiastic, inspiring",
   },

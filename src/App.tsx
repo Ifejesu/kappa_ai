@@ -25,7 +25,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
   
-  if (!user) {
+  if (!user?.id) {
     return <Navigate to="/auth" replace />;
   }
   
@@ -44,13 +44,13 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/characters" element={<Characters />} />
-                <Route 
-                  path="/conversation/:characterId" 
+                <Route
+                  path="/conversation/:characterId"
                   element={
                     <ProtectedRoute>
                       <Conversation />
                     </ProtectedRoute>
-                  } 
+                  }
                 />
                 <Route path="/about" element={<About />} />
                 <Route path="/auth" element={<Auth />} />

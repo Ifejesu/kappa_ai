@@ -19,10 +19,11 @@ const ConversationInterface: React.FC<ConversationInterfaceProps> = ({ character
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { getConversation, addMessage } = useConversation();
+  const { getConversation, addMessage, fetchConversations } = useConversation();
   const { toast } = useToast();
   const { user } = useContext(AuthContext);
   const api = new API();
+  const [loading, setLoading] = useState(false);
 
   
   // Load conversation from context on mount
@@ -46,10 +47,19 @@ const ConversationInterface: React.FC<ConversationInterfaceProps> = ({ character
     }
   }, [character, getConversation, addMessage]);
 
-  // Auto-scroll to bottom when messages change
-  useEffect(() => {
+  const handleScroll = ()=>{
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }
+  useEffect(() => {
+    setLoading(true);
+    fetchConversations().then(()=> {
+      setLoading(false);
+      setTimeout(handleScroll, 1000)
+    });
+  }, []);
+
+  // Auto-scroll to bottom when messages change
+  useEffect(handleScroll, [messages]);
 
   const handleSendMessage = () => {
     if (input.trim() === '') return;
@@ -78,15 +88,16 @@ const ConversationInterface: React.FC<ConversationInterfaceProps> = ({ character
   const generateAIResponse = async (userInput: string) => {
     try {
       const response = await api.sendChat(
+          character.id,
           user.username,
           user.password,
           userInput
       )
       // Get recent conversation history (last 10 messages)
-      const recentMessages = messages.slice(-10).map(msg => ({
-        sender: msg.sender,
-        content: msg.content
-      }));
+      // const recentMessages = messages.slice(-10).map(msg => ({
+      //   sender: msg.sender,
+      //   content: msg.content
+      // }));
 
       // Call our edge function to get the AI response
       // const { data, error } = await supabase.functions.invoke('generate-ai-response', {
@@ -158,14 +169,20 @@ const ConversationInterface: React.FC<ConversationInterfaceProps> = ({ character
       </div>
       
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{maxHeight: 'calc(100vh - 300px)'}}>
         {messages.map((message) => (
-          <MessageBubble 
-            key={message.id} 
-            message={message} 
-            isTyping={isTyping && message === messages[messages.length - 1] && message.sender === 'ai'} 
+            <MessageBubble
+                key={message.id}
+                message={message}
+                isTyping={isTyping && message === messages[messages.length - 1] && message.sender === 'ai'}
           />
         ))}
+        <div ref={messagesEndRef}></div>
+        {
+            loading && <div className="flex items-center justify-center p-5">
+              <p className="font-light"><i>Loading Conversations ...</i></p>
+            </div>
+        }
         
         {isTyping && (
           <div className="flex w-full justify-start mb-4">
@@ -178,8 +195,6 @@ const ConversationInterface: React.FC<ConversationInterfaceProps> = ({ character
             </div>
           </div>
         )}
-        
-        <div ref={messagesEndRef} />
       </div>
       
       {/* Input area */}
